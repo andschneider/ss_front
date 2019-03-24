@@ -9,6 +9,12 @@ def get_layout():
     return html.Div(
         html.Div(
             [
+                # live update interval
+                dcc.Interval(
+                    id="interval-component",
+                    interval=1 * 1000 * 120,  # in milliseconds
+                    n_intervals=0,
+                ),
                 Column(
                     width=3,
                     children=[
@@ -18,7 +24,30 @@ def get_layout():
                                 html.P("Select sensors to plot:"),
                                 create_sensor_table(),
                             ]
-                        )
+                        ),
+                        Card(
+                            children=[
+                                html.P("Select amount of data in minutes to plot:"),
+                                dcc.Input(id="input-minutes", placeholder="10"),
+                                html.Div(style={"padding": "15px"}),
+                                html.P(
+                                    "Select amount minutes for the rolling average:"
+                                ),
+                                dcc.Slider(
+                                    id="input-rolling",
+                                    min=0,
+                                    max=120,
+                                    step=1,
+                                    value="60",
+                                    marks={
+                                        i: str(i) for i in [1, 20, 40, 60, 80, 100, 120]
+                                    },
+                                ),
+                                html.Div(style={"padding": "15px"}),
+                                html.Div(style={"padding": "15px"}),
+                                html.Button("Plot Data", id="button-get-data"),
+                            ]
+                        ),
                     ],
                 ),
                 Column(
@@ -26,19 +55,20 @@ def get_layout():
                     children=[
                         Card(
                             children=[
+                                # TODO using the loading state is a nice feature but it's causing problems with the
+                                # displaying the graph when the settings are changed but not plotted
+                                # TODO look into this later
+                                # dcc.Loading(
                                 dcc.Graph(
                                     id="subplots-live",
                                     style=dict(width="100%", height="80vh"),
-                                )
+                                ),
+                                # 'graph', 'cube', 'circle', 'dot', 'default'
+                                # type="dot"
+                                # )
                             ]
                         )
                     ],
-                ),
-                # live update interval
-                dcc.Interval(
-                    id="interval-component",
-                    interval=1 * 1000 * 300,  # in milliseconds
-                    n_intervals=0,
                 ),
             ]
         )
