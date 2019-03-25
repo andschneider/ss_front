@@ -24,3 +24,13 @@ class DataManager:
             df.set_index(pd.DatetimeIndex(df["date"]), inplace=True)
             df.drop(columns=["date"], inplace=True)
             self.sensor_data = df
+
+    def get_plant_names(self):
+        """Gets the plant name and its sensor id to populate the table."""
+        plants = []
+        for s_id in self.sensor_ids:
+            status, data = self.sensor_api.get_plant_by_id(s_id)
+            if status == 200:
+                plants.append(data["data"])
+            # TODO catch api errors
+        return plants

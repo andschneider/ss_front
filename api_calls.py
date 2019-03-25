@@ -32,3 +32,8 @@ class SensorAPI:
         full_url = url + "?" + args
         r = requests.get(full_url)
         return r.status_code, r.json()
+
+    def get_plant_by_id(self, sensor_id):
+        url = self.base_url + "/sensor_info"
+        r = requests.get(url, params={"sensor_id": sensor_id})
+        return r.status_code, r.json()

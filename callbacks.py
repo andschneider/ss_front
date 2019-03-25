@@ -15,11 +15,7 @@ def setup_callbacks(app):
     )
     def update_table(n):
         if n == 0:
-            # get data
-            table_data = []
-            for s_id in dm.sensor_ids:
-                table_data.append({"sensor_id": s_id})
-            return table_data
+            return dm.get_plant_names()
 
     @app.callback(
         Output("subplots-live", "figure"),
