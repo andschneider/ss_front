@@ -31,8 +31,8 @@ def setup_callbacks(app):
     def update_plot(n, selected, minutes, rolling, button_click, existing_state):
         # TODO the state is a workaround for the dcc.loading issue in layout.py but is not optimal
         ctx = dash.callback_context
-        print(ctx.inputs)
-        print(ctx.triggered)
+        # print(f"inputs: {ctx.inputs}")
+        # print(f"trigger: {ctx.triggered}")
 
         # TODO allow for multiple selection
         sensor_ids = dm.sensor_ids[selected[0]]
@@ -42,19 +42,12 @@ def setup_callbacks(app):
             minutes = 10
 
         # run when the time interval set in layout.py is up
-        if ctx.triggered[0]["prop_id"].split("-")[0] == "interval":
-            print("updating automatically")
-            dm.update_sensor_data(minutes, sensor_ids)
-            data_rolled = dm.sensor_data.rolling(int(rolling)).mean()
-            return create_sub_plots(dm.sensor_data, data_rolled)
-
-        # run on button click
-        elif ctx.triggered[0]["prop_id"].split("-")[0] == "button":
-            print("plotting")
-            # get data
+        trigger = ctx.triggered[0]["prop_id"].split("-")[0]
+        if trigger == "interval" or trigger == "button":
+            print("updating plot")
             dm.update_sensor_data(minutes, sensor_ids)
             # create a rolling average
-            data_rolled = dm.sensor_data.rolling(int(rolling)).mean()
+            data_rolled = dm.sensor_data.rolling(int(rolling), on="date").mean()
             return create_sub_plots(dm.sensor_data, data_rolled)
 
         # don't run

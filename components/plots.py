@@ -17,7 +17,7 @@ def create_moisture_plot(data):
     """
     moisture_data = go.Scatter(
         name="moisture",
-        x=data.index,
+        x=data["date"],
         y=data["moisture"],
         line=dict(width=2, color="rgb(58, 118, 175)"),
     )
@@ -52,7 +52,7 @@ def create_sub_plots(data, rolled_data):
     fig = plotly.tools.make_subplots(
         rows=2, cols=1, vertical_spacing=0.2, print_grid=False
     )
-    fig["layout"]["margin"] = {"l": 30, "r": 10, "b": 30, "t": 10}
+    fig["layout"]["margin"] = {"l": 50, "r": 10, "b": 50, "t": 10}
     fig["layout"]["legend"] = {
         "x": 0.9,
         "y": 0.47,
@@ -63,9 +63,11 @@ def create_sub_plots(data, rolled_data):
     }
 
     # moisture traces
+    fig["layout"]["xaxis1"].update(title="Date [UTC]")
+    fig["layout"]["yaxis1"].update(title="Moisture [capacitance]")
     fig.append_trace(
         {
-            "x": data.index,
+            "x": data["date"],
             "y": data["moisture"],
             "name": "moist raw",
             "mode": "lines",
@@ -76,7 +78,7 @@ def create_sub_plots(data, rolled_data):
     )
     fig.append_trace(
         {
-            "x": rolled_data.index,
+            "x": rolled_data["date"],
             "y": rolled_data["moisture"],
             "name": "moist rolled",
             "mode": "lines",
@@ -87,9 +89,11 @@ def create_sub_plots(data, rolled_data):
     )
 
     # temperature traces
+    fig["layout"]["xaxis2"].update(title="Date [UTC]")
+    fig["layout"]["yaxis2"].update(title="Temperature [F]")
     fig.append_trace(
         {
-            "x": data.index,
+            "x": data["date"],
             "y": data["temp"],
             "name": "temp raw",
             "mode": "lines",
@@ -100,7 +104,7 @@ def create_sub_plots(data, rolled_data):
     )
     fig.append_trace(
         {
-            "x": rolled_data.index,
+            "x": rolled_data["date"],
             "y": rolled_data["temp"],
             "name": "temp rolled",
             "mode": "lines",

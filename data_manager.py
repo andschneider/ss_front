@@ -17,13 +17,12 @@ class DataManager:
         if status == 200:
             # for s_id in self.sensor_ids:
             # TODO make keys ints?
-            df = pd.DataFrame(
+            self.sensor_data = pd.DataFrame(
                 data["data"][str(sensor_id)], columns=["date", "temp", "moisture"]
             )
-            # TODO clean this up
-            df.set_index(pd.DatetimeIndex(df["date"]), inplace=True)
-            df.drop(columns=["date"], inplace=True)
-            self.sensor_data = df
+            # TODO set the time to PCT timezone
+            self.sensor_data["date"] = pd.to_datetime(self.sensor_data["date"])
+            self.sensor_data.sort_values(by="date", ascending=True, inplace=True)
 
     def get_plant_names(self):
         """Gets the plant name and its sensor id to populate the table."""

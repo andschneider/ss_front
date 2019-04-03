@@ -18,7 +18,7 @@ def get_layout():
                 Column(
                     width=3,
                     children=[
-                        Comment("**SOIL SENSE v0**"),
+                        Comment("**SOIL SENSE v0.1.0**"),
                         Card(
                             children=[
                                 html.P("Select sensors to plot:"),
