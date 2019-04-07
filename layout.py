@@ -21,12 +21,10 @@ def get_layout():
                         ),
                         Card(
                             children=[
-                                html.P("Select amount of data in minutes to plot:"),
+                                html.P("Select number of minutes of data to plot:"),
                                 dcc.Input(id="input-minutes", placeholder="10"),
                                 html.Div(style={"padding": "15px"}),
-                                html.P(
-                                    "Select amount minutes for the rolling average:"
-                                ),
+                                html.Div(id="slider-value"),
                                 dcc.Slider(
                                     id="input-rolling",
                                     min=0,

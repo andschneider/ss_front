@@ -10,6 +10,10 @@ def setup_callbacks(app):
     dm = DataManager()
     print(" +++ callbacks setup")
 
+    @app.callback(Output("slider-value", "children"), [Input("input-rolling", "value")])
+    def display_slider_value(slider_input):
+        return f"Select number of minutes for the rolling average ({slider_input}):"
+
     @app.callback(
         Output("subplots-live", "figure"),
         [
@@ -30,9 +34,11 @@ def setup_callbacks(app):
 
         # on page load default to 10 minutes
         if not minutes:
-            minutes = 10
+            dm.update_sensor_data(10, sensor_ids)
+            data_rolled = dm.sensor_data.rolling(int(rolling), on="date").mean()
+            return create_sub_plots(dm.sensor_data, data_rolled)
 
-        # run when the time interval set in layout.py is up
+        # run when the button is clicked
         if ctx.triggered[0]["prop_id"].split("-")[0] == "button":
             print("updating plot")
             dm.update_sensor_data(int(minutes), sensor_ids)

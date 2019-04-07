@@ -55,7 +55,7 @@ class DataManager:
                 self.cache_data.sort_values(by="date", ascending=True, inplace=True)
                 self.cache_data.drop_duplicates(["date"], keep="last", inplace=True)
                 # change the data that is plotted
-                self.sensor_data = self.cache_data.iloc[-minutes:]
+                self.sensor_data = self.cache_data.tail(minutes)
 
     def compare_time(self):
         """Compares the times in the cached data as well as the current time.
