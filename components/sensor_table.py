@@ -1,10 +1,15 @@
 import dash_table
 
+from data_manager import DataManager
+
 
 def create_sensor_table():
+    dm = DataManager()
+    data = dm.get_plant_names()
     table = dash_table.DataTable(
         id="sensor-table",
         columns=[{"name": i, "id": i} for i in ["sensor_id", "plant_name"]],
+        data=data,
         active_cell=[],
         is_focused=True,
         row_selectable="multiple",

@@ -9,16 +9,10 @@ def get_layout():
     return html.Div(
         html.Div(
             [
-                # live update interval
-                dcc.Interval(
-                    id="interval-component",
-                    interval=1 * 1000 * 120,  # in milliseconds
-                    n_intervals=0,
-                ),
                 Column(
                     width=3,
                     children=[
-                        Comment("**SOIL SENSE v0.1.0**"),
+                        Comment("**SOIL SENSE v0.2.0**"),
                         Card(
                             children=[
                                 html.P("Select sensors to plot:"),

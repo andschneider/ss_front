@@ -11,24 +11,15 @@ def setup_callbacks(app):
     print(" +++ callbacks setup")
 
     @app.callback(
-        Output("sensor-table", "data"), [Input("interval-component", "n_intervals")]
-    )
-    def update_table(n):
-        if n == 0:
-            return dm.get_plant_names()
-
-    @app.callback(
         Output("subplots-live", "figure"),
         [
-            Input("interval-component", "n_intervals"),
             Input("sensor-table", "selected_rows"),
             Input("input-minutes", "value"),
             Input("input-rolling", "value"),
             Input("button-get-data", "n_clicks"),
         ],
-        [State("subplots-live", "figure")],
     )
-    def update_plot(n, selected, minutes, rolling, button_click, existing_state):
+    def update_plot(selected, minutes, rolling, button_click):
         # TODO the state is a workaround for the dcc.loading issue in layout.py but is not optimal
         ctx = dash.callback_context
         # print(f"inputs: {ctx.inputs}")
@@ -42,13 +33,8 @@ def setup_callbacks(app):
             minutes = 10
 
         # run when the time interval set in layout.py is up
-        trigger = ctx.triggered[0]["prop_id"].split("-")[0]
-        trigger_value = ctx.triggered[0]["value"]
-        if trigger == "interval" or trigger == "button":
+        if ctx.triggered[0]["prop_id"].split("-")[0] == "button":
             print("updating plot")
-            # live update every minute
-            if trigger == "interval" and trigger_value != 0:
-                minutes = 1
             dm.update_sensor_data(int(minutes), sensor_ids)
             # create a rolling average
             # TODO set the time to PCT timezone
