@@ -43,10 +43,15 @@ def setup_callbacks(app):
 
         # run when the time interval set in layout.py is up
         trigger = ctx.triggered[0]["prop_id"].split("-")[0]
+        trigger_value = ctx.triggered[0]["value"]
         if trigger == "interval" or trigger == "button":
             print("updating plot")
-            dm.update_sensor_data(minutes, sensor_ids)
+            # live update every minute
+            if trigger == "interval" and trigger_value != 0:
+                minutes = 1
+            dm.update_sensor_data(int(minutes), sensor_ids)
             # create a rolling average
+            # TODO set the time to PCT timezone
             data_rolled = dm.sensor_data.rolling(int(rolling), on="date").mean()
             return create_sub_plots(dm.sensor_data, data_rolled)
 

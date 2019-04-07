@@ -31,7 +31,10 @@ class SensorAPI:
 
         full_url = url + "?" + args
         r = requests.get(full_url)
-        return r.status_code, r.json()
+        if r.status_code == 200:
+            return r.json()
+        # TODO catch api errors
+        # return r.status_code, r.json()
 
     def get_plant_by_id(self, sensor_id):
         url = self.base_url + "/sensor_info"
