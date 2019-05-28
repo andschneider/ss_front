@@ -14,9 +14,14 @@ class SensorAPI:
     def _load_api_settings():
         parser = ConfigParser()
         settings_file = os.path.join(SETTINGS_FOLDER, "api_settings.ini")
-        parser.read(settings_file)
-        url = parser["web"]["base_url"]
-        return url
+        if os.path.exists(settings_file):
+            parser.read(settings_file)
+            url = parser["web"]["base_url"]
+            return url
+        else:
+            url = "http://localhost:3030"
+            print(f"No API settings file found. Defaulting to {url}")
+            return url
 
     def get_sensor_ids(self):
         url = self.base_url + "/get_sensor_ids"
