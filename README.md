@@ -12,6 +12,7 @@ To run the dashboard locally, build the docker image and then run it. Note that 
     ```bash
     $ docker run -p 8050:8050 ss_front
     ```
+    *If running the API locally, use `--network="host"`*
 
 ## Dashboard Design
 The design of the dashboard is fairly straightforward, containing three main sections:
