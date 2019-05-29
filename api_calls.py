@@ -8,7 +8,7 @@ from locations import SETTINGS_FOLDER
 
 class SensorAPI:
     def __init__(self):
-        self.base_url = self._load_api_settings()
+        self.base_url, self.api_version = self._load_api_settings()
 
     @staticmethod
     def _load_api_settings():
@@ -17,19 +17,25 @@ class SensorAPI:
         if os.path.exists(settings_file):
             parser.read(settings_file)
             url = parser["web"]["base_url"]
-            return url
+            return url, 1
         else:
             url = "http://localhost:3030"
             print(f"No API settings file found. Defaulting to {url}")
-            return url
+            return url, 2
 
     def get_sensor_ids(self):
-        url = self.base_url + "/get_sensor_ids"
+        if self.api_version == 1:
+            url = self.base_url + "/get_sensor_ids"
+        else:
+            url = self.base_url + "/sensor_ids"
         r = requests.get(url)
         return r.status_code, r.json()
 
     def get_sensor_data(self, minutes, sensor_ids):
-        url = self.base_url + "/get_sensor_data"
+        if self.api_version == 1:
+            url = self.base_url + "/get_sensor_data"
+        else:
+            url = self.base_url + "/sensor_data"
 
         id_string = ",".join([str(s_id) for s_id in sensor_ids])
         args = f"sensor_ids={id_string}&minutes={minutes}"
@@ -42,6 +48,11 @@ class SensorAPI:
         # return r.status_code, r.json()
 
     def get_plant_by_id(self, sensor_id):
-        url = self.base_url + "/sensor_info"
-        r = requests.get(url, params={"sensor_id": sensor_id})
+        if self.api_version == 1:
+            url = self.base_url + "/sensor_info"
+            r = requests.get(url, params={"sensor_id": sensor_id})
+        else:
+            url = self.base_url + "/sensor_info/" + str(sensor_id)
+            r = requests.get(url)
+
         return r.status_code, r.json()
