@@ -39,6 +39,7 @@ class DataManager:
             # case 1 - pull all new data
             if minutes > dataframe_time_diff:
                 self._get_new_data(minutes, sensor_id)
+
             # case 2 - add new data or display already downloaded data
             elif 0 < current_time_diff < dataframe_time_diff:
                 # pull new data from db
@@ -46,14 +47,18 @@ class DataManager:
                 data = self.sensor_api.get_sensor_data(
                     current_time_diff, self.sensor_ids
                 )
-                # TODO clean this up
                 new_data = pd.DataFrame(
                     data["data"][str(sensor_id)], columns=["date", "temp", "moisture"]
                 )
                 new_data["date"] = pd.to_datetime(new_data["date"])
-                self.cache_data = self.cache_data.append(new_data, ignore_index=True)
-                self.cache_data.sort_values(by="date", ascending=True, inplace=True)
-                self.cache_data.drop_duplicates(["date"], keep="last", inplace=True)
+
+                # update cached data
+                self.cache_data = (
+                    self.cache_data.append(new_data, ignore_index=True)
+                    .sort_values(by="date", ascending=True)
+                    .drop_duplicates(["date"], keep="last")
+                )
+
                 # change the data that is plotted
                 self.sensor_data = self.cache_data.tail(minutes)
 
@@ -71,8 +76,10 @@ class DataManager:
         # get min and max minutes in dataframe
         latest = max(self.cache_data["date"])
         earliest = min(self.cache_data["date"])
+
         # change timedelta to minutes
         df_time_dff = (latest - earliest).seconds // 60
+
         # compare minutes requested to current time
         current_time_diff = (datetime.datetime.utcnow() - latest).seconds // 60
         # print(f"Current:{current_time_diff}, DF: {df_time_dff}")
@@ -85,6 +92,7 @@ class DataManager:
         self.sensor_data = pd.DataFrame(
             data["data"][str(sensor_id)], columns=["date", "temp", "moisture"]
         )
+
         self.sensor_data["date"] = pd.to_datetime(self.sensor_data["date"])
         self.sensor_data.sort_values(by="date", ascending=True, inplace=True)
         # shady caching
