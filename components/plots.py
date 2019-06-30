@@ -1,117 +1,74 @@
 import plotly
-import plotly.graph_objs as go
 
 
-def create_moisture_plot(data):
-    """Creates a single plot of moisture data.
+class Plot:
+    def __init__(self):
+        self.figure = self._create_sub_plots()
 
-    Parameters
-    ----------
-    data : DataFrame
-        A dataframe of the sensor data, with the index as the date and a column labeled 'moisture.'
+    def add_data(self, data, rolled_data, sensor_id):
+        """Creates traces and appends them to the figure."""
+        temperature_trace, temperature_trace_rolled = self._create_traces(
+            data, rolled_data, "temp", sensor_id
+        )
+        moist_trace, moist_trace_rolled = self._create_traces(
+            data, rolled_data, "moisture", sensor_id
+        )
 
-    Returns
-    -------
-    figure : Plotly figure
-        A Plotly figure object to be passed to a Dash Graph object.
-    """
-    moisture_data = go.Scatter(
-        name="moisture",
-        x=data["date"],
-        y=data["moisture"],
-        line=dict(width=2, color="rgb(58, 118, 175)"),
-    )
+        self.figure.append_trace(moist_trace, 1, 1)
+        self.figure.append_trace(moist_trace_rolled, 1, 1)
+        self.figure.append_trace(temperature_trace, 2, 1)
+        self.figure.append_trace(temperature_trace_rolled, 2, 1)
 
-    traces = [moisture_data]
-    layout = go.Layout(
-        showlegend=False,
-        margin=dict(l=60, r=60, b=60, t=60),
-        hovermode="closest",
-        title="moisture",
-        xaxis=dict(title="date"),
-        yaxis=dict(title="moisture"),
-    )
-    return go.Figure(data=traces, layout=layout)
+    @staticmethod
+    def _create_sub_plots():
+        """Creates two blank plots, one for temperature and one for moisture sensor data. Actual data is added to plot later.
 
+        Returns
+        -------
+        figure : Plotly figure
+            A Plotly figure object to be passed to a Dash Graph object.
 
-def create_sub_plots(data, rolled_data):
-    """Creates two plots, one of temperature and one of moisture sensor data. Also plots the rolling average data.
+        """
+        fig = plotly.tools.make_subplots(
+            rows=2, cols=1, vertical_spacing=0.2, print_grid=False
+        )
+        fig["layout"]["margin"] = {"l": 50, "r": 10, "b": 50, "t": 10}
+        fig["layout"]["legend"] = {
+            # "x": 0.9,
+            # "y": 0.47,
+            "xanchor": "left",
+            "bgcolor": "rgba(0,0,0,0)",
+            # "bordercolor": "grey",
+            # "borderwidth": 1,
+            "orientation": "h",
+        }
 
-    Parameters
-    ----------
-    data : DataFrame
-        A DataFrame of the sensor data, with the index as the date and columns labeled 'moisture' and 'temp.'
-    rolled_data : DataFrame
-        A DataFrame that has had a rolling average applied to it.
+        # moisture traces
+        fig["layout"]["xaxis1"].update(title="Date [UTC]")
+        fig["layout"]["yaxis1"].update(title="Moisture [capacitance]")
 
-    Returns
-    -------
-    figure : Plotly figure
-        A Plotly figure object to be passed to a Dash Graph object.
-    """
-    fig = plotly.tools.make_subplots(
-        rows=2, cols=1, vertical_spacing=0.2, print_grid=False
-    )
-    fig["layout"]["margin"] = {"l": 50, "r": 10, "b": 50, "t": 10}
-    fig["layout"]["legend"] = {
-        "x": 0.9,
-        "y": 0.47,
-        "xanchor": "left",
-        "bgcolor": "rgba(0,0,0,0)",
-        "bordercolor": "grey",
-        "borderwidth": 1,
-    }
+        # temperature traces
+        fig["layout"]["xaxis2"].update(title="Date [UTC]")
+        fig["layout"]["yaxis2"].update(title="Temperature [F]")
 
-    # moisture traces
-    fig["layout"]["xaxis1"].update(title="Date [UTC]")
-    fig["layout"]["yaxis1"].update(title="Moisture [capacitance]")
-    fig.append_trace(
-        {
+        return fig
+
+    @staticmethod
+    def _create_traces(data, rolled_data, category, sensor_id):
+        """Create a trace for raw and rolled data."""
+        trace = {
             "x": data["date"],
-            "y": data["moisture"],
-            "name": "moist raw",
+            "y": data[category],
+            "name": f"{sensor_id} {category} raw",
             "mode": "lines",
             "type": "scatter",
-        },
-        1,
-        1,
-    )
-    fig.append_trace(
-        {
-            "x": rolled_data["date"],
-            "y": rolled_data["moisture"],
-            "name": "moist rolled",
-            "mode": "lines",
-            "type": "scatter",
-        },
-        1,
-        1,
-    )
+        }
 
-    # temperature traces
-    fig["layout"]["xaxis2"].update(title="Date [UTC]")
-    fig["layout"]["yaxis2"].update(title="Temperature [F]")
-    fig.append_trace(
-        {
-            "x": data["date"],
-            "y": data["temp"],
-            "name": "temp raw",
-            "mode": "lines",
-            "type": "scatter",
-        },
-        2,
-        1,
-    )
-    fig.append_trace(
-        {
+        trace_rolled = {
             "x": rolled_data["date"],
-            "y": rolled_data["temp"],
-            "name": "temp rolled",
+            "y": rolled_data[category],
+            "name": f"{sensor_id} {category} roll",
             "mode": "lines",
             "type": "scatter",
-        },
-        2,
-        1,
-    )
-
-    return fig
+        }
+        return trace, trace_rolled

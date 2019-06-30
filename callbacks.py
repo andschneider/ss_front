@@ -2,7 +2,7 @@ import dash
 from dash.dependencies import Input, Output, State
 import dash.exceptions
 
-from components.plots import create_sub_plots
+from components.plots import Plot
 from data_manager import DataManager
 
 
@@ -31,6 +31,9 @@ def setup_callbacks(app):
 
         sensor_ids = [dm.sensor_ids[s_id] for s_id in selected]
 
+        # create blank plot
+        plot = Plot()
+
         # on page load default to 10 minutes
         if not minutes:
             dm.update_sensor_data(10, sensor_ids)
@@ -38,19 +41,24 @@ def setup_callbacks(app):
                 data_rolled = (
                     dm.sensor_data[sensor].rolling(int(rolling), on="date").mean()
                 )
-            return create_sub_plots(dm.sensor_data[sensor], data_rolled)
+                plot.add_data(dm.sensor_data[sensor], data_rolled, sensor)
+
+            return plot.figure
 
         # run when the button is clicked
         if ctx.triggered[0]["prop_id"].split("-")[0] == "button":
             print("updating plot")
             dm.update_sensor_data(int(minutes), sensor_ids)
+
             # create a rolling average
             # TODO set the time to PCT timezone
             for sensor in sensor_ids:
                 data_rolled = (
                     dm.sensor_data[sensor].rolling(int(rolling), on="date").mean()
                 )
-            return create_sub_plots(dm.sensor_data[sensor], data_rolled)
+                plot.add_data(dm.sensor_data[sensor], data_rolled, sensor)
+
+            return plot.figure
 
         # don't run
         else:
