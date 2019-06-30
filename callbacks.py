@@ -29,14 +29,16 @@ def setup_callbacks(app):
         # print(f"inputs: {ctx.inputs}")
         # print(f"trigger: {ctx.triggered}")
 
-        # TODO allow for multiple selection
-        sensor_ids = dm.sensor_ids[selected[0]]
+        sensor_ids = [dm.sensor_ids[s_id] for s_id in selected]
 
         # on page load default to 10 minutes
         if not minutes:
             dm.update_sensor_data(10, sensor_ids)
-            data_rolled = dm.sensor_data.rolling(int(rolling), on="date").mean()
-            return create_sub_plots(dm.sensor_data, data_rolled)
+            for sensor in sensor_ids:
+                data_rolled = (
+                    dm.sensor_data[sensor].rolling(int(rolling), on="date").mean()
+                )
+            return create_sub_plots(dm.sensor_data[sensor], data_rolled)
 
         # run when the button is clicked
         if ctx.triggered[0]["prop_id"].split("-")[0] == "button":
@@ -44,8 +46,11 @@ def setup_callbacks(app):
             dm.update_sensor_data(int(minutes), sensor_ids)
             # create a rolling average
             # TODO set the time to PCT timezone
-            data_rolled = dm.sensor_data.rolling(int(rolling), on="date").mean()
-            return create_sub_plots(dm.sensor_data, data_rolled)
+            for sensor in sensor_ids:
+                data_rolled = (
+                    dm.sensor_data[sensor].rolling(int(rolling), on="date").mean()
+                )
+            return create_sub_plots(dm.sensor_data[sensor], data_rolled)
 
         # don't run
         else:
