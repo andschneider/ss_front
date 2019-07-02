@@ -12,7 +12,7 @@ def get_layout():
                 Column(
                     width=3,
                     children=[
-                        Comment("**SOIL SENSE v0.2.0**"),
+                        Comment("**SOIL SENSE v0.3.0**"),
                         Card(
                             children=[
                                 html.P("Select sensors to plot:"),
@@ -30,7 +30,7 @@ def get_layout():
                                     min=0,
                                     max=120,
                                     step=1,
-                                    value="60",
+                                    value=60,
                                     marks={
                                         i: str(i) for i in [1, 20, 40, 60, 80, 100, 120]
                                     },

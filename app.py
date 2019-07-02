@@ -6,7 +6,6 @@ from layout import get_layout
 
 app = dash.Dash(__name__)
 app.title = "soil-sense"
-app.css.append_css({"external_url": "static/style.css"})
 
 
 app.layout = get_layout()

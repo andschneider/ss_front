@@ -11,18 +11,16 @@ def create_sensor_table():
             {"name": i.replace("_", " "), "id": i} for i in ["sensor_id", "plant_name"]
         ],
         data=dm.plant_names,
-        active_cell=[],
         is_focused=True,
-        row_selectable="multiple",
+        row_selectable="multi",
         selected_rows=[0],
-        # sorting="be",
-        # sorting_type="single",
-        # sorting_settings=[],
+        # sort_action="native",
+        # sort_mode="multi",
         style_header={"backgroundColor": "white", "fontWeight": "bold"},
         style_cell={"textAlign": "center", "fontSize": 14, "font-family": "sans-serif"},
-        style_cell_conditional=[
-            {"if": {"row_index": "odd"}, "backgroundColor": "rgb(248, 248, 248)"}
-        ],
+        # style_cell_conditional=[
+        #     {"if": {"row_index": "odd"}, "backgroundColor": "rgb(248, 248, 248)"}
+        # ],
         editable=False,
         style_as_list_view=True,
     )
